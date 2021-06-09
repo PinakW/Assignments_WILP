@@ -44,9 +44,10 @@ def gen_mat(size, multiplier,diag_dom=False):
   return A
 
 def diag_1(A):
+  global round_factor
   nrow = len(A[:,0])
   for i in range(nrow):
-    A[i] = A[i]/A[i][i]
+    A[i] = np.round(A[i]/A[i][i],decimals=round_factor)
   return A
 def decompose(A):
   #A = diag_1(A)
@@ -69,6 +70,7 @@ def check_conv(x_new, x, tolerance):
   else:
     return False
 def Gauss_Seidel(A_aug, x, tolerance, N):
+  global round_factor
   A_aug = diag_1(A_aug)
   #split A_aug int A and b
   ncol = len(A_aug[0,:])
@@ -96,6 +98,7 @@ def Gauss_Seidel(A_aug, x, tolerance, N):
       temp[j] = b[j] - np.dot(L[j], x_new) - np.dot(U[j],x)
       #Update immediately for Seibel
       x_new[j] = temp[j]
+    x_new = np.around(x_new, decimals=round_factor)
     print("x after iteration " + str(iter))
     #print(x)
     print(x_new)
@@ -109,6 +112,7 @@ def Gauss_Seidel(A_aug, x, tolerance, N):
     print("iter = " + str(iter))
     return x_new
 def Gauss_Jacobi(A_aug,x, tolerance, N):
+  global round_factor
   A_aug = diag_1(A_aug)
   ncol = len(A_aug[0,:])
   #b = A_aug[:,(ncol-1)].reshape(nrows,1)           #Reshape only for Gauss Jacobi
@@ -132,6 +136,7 @@ def Gauss_Jacobi(A_aug,x, tolerance, N):
       temp[j] = b[j] + np.dot(mat_diff[j],x)
     #Update after one iteration for Jacobi
     x_new = copy.deepcopy(temp)
+    x_new = np.round(x_new,decimals=round_factor)
     print("x after iteration " + str(iter))
     #print(x)
     print(x_new)
@@ -146,13 +151,21 @@ def Gauss_Jacobi(A_aug,x, tolerance, N):
     return x_new
 
 #MAIN
-size = 4
+size = 3
+round_factor = 3
 #We will use augmented matrix
 ncols = size + 1
 nrows = size
 multiplier = 10
-
+#np.array([[6, -2, 1, 11],[-2, 7, 2, 5],[1, 2, -5, -1]])#
 A_aug = gen_mat(size, multiplier,diag_dom=True)#np.array([[1.0, -0.25, -0.25, 0, 50],[-0.25,1, 0, -0.25, 50],[-0.25, 0, 1, -0.25, 25],[0, -0.25, -0.25, 1, 25]])#multiplier * np.random.rand(nrows,ncols)
+A_aug = A_aug.astype(float)
+#nrow = len(A_aug[:,0])
+#ncol = len(A_aug[0,:])
+#for i in range(nrow):
+#  A_aug[i] = np.round(A_aug[i],decimals=round_factor)
+
+#round it off
 #b = multiplier * np.random.rand(ncols).reshape(ncols,1)
 #x = np.zeros(ncols).reshape(ncols,1)
 #x_new = np.zeros(ncols).reshape(ncols,1)

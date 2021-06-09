@@ -66,7 +66,7 @@ def GE(mat,pivot=False):
         #important we need to round the scale_factor to significant values as well
         scale_factor = ret_sigbit(scale_factor)
       except:
-        sys.exit("Illegal math operation at" + str(i) +"," + str(j) + "\n" +str(mat[j][i]) + " / "+ str(mat[i][i])+"\nExitting...")
+        sys.exit("Illegal math operation at " + str(i) +", " + str(j) + "\n" +str(mat[j][i]) + " / "+ str(mat[i][i])+"\nThe output of pivot = " + str(pivot) + " is wrong, possibly due to pivot element = zero")
       temp_subtractor = scale_factor * mat[i]
       temp_subtractor = ret_sigbit(temp_subtractor,dimension=1)
       mat[j] = mat[j] - temp_subtractor
@@ -97,20 +97,21 @@ def solve(mat):
   mat_orig = copy.deepcopy(mat)
   print("Matrix after significant digit changes:")
   print(mat_orig)
-  solution = back_sub(GE(mat))
+  solution = back_sub(GE(mat, pivot=True))
   print("Result without Pivoting:")
   print(solution)
   mat = copy.deepcopy(mat_orig)
-  solution = back_sub(GE(mat, pivot=True))
+  solution = back_sub(GE(mat))
   print("Result with Pivoting:")
   print(solution)
 
 #main
-size = 2
+size = 4
 multiplier =  100
 d = int(input("Enter significant digits: "))
-
-mat = np.array([[0.0004, 1.4020, 1.4060],[0.4003, -1.5020, 2.5010]])#multiplier * np.random.rand(size,size +1)#
+#mat = np.array([[0, 2, 0, 1, 0],[2, 2, 3, 2, -2], [4, -3, 0, 1, -7], [6, 1, -6, -5, 6]])
+mat = multiplier * np.random.rand(size,size +1)
+mat = mat.astype(float)
 #print("Generated random matrix of size " + str(size) + " x " +str(size) + " :")
 #print(mat)
 solve(ret_sigbit(mat,dimension=2))

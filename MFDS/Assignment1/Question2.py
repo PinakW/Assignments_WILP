@@ -1,6 +1,23 @@
 import numpy as np
 import sys
 import copy
+def gen_diag_non_dominant(size, multiplier):
+  """
+  This code generates diagonally non dominant matrices which cannot be made dominant, even after row exchange
+  """
+  size = int(input("Enter size of matrix: "))
+  flag = 0
+  while (flag != size*size):
+    flag = 0
+    a = 20 * np.random.rand(size,size+1)
+    for i in range(len(a[:,0])):
+      for j in range(len(a[0,:])-1):
+        if abs(a[i][j]) < np.sum(abs(a[i][:size])) - abs(a[i][j]):
+          flag += 1
+        else:
+          flag -= 1
+  return a
+
 def gen_mat(size, multiplier,diag_dom=False):
   ncols = size + 1
   nrows = size
@@ -39,6 +56,11 @@ def gen_mat(size, multiplier,diag_dom=False):
           A[i][i] = A[i][i] + diff + Positive_number_guard
         elif A[i][i] > 0:
           A[i][i] = A[i][i] - diff - Positive_number_guard
+  #Here we break out for Diagonally non dominant flow. We understood that a matrix can be MADE diagonally dominant by row interchanges
+  #Hence, we need to ensure that we need to generate a matrix which cannot be MADE diagonally dominant.
+  if diag_dom==False:
+    A = gen_diag_non_dominant(size, multiplier)
+    #it might seem that this is an extra step but this is right way for a diagonally non dominant matrix
   print("Generated A_aug")
   print(A)
   return A
@@ -152,7 +174,7 @@ def Gauss_Jacobi(A_aug,x, tolerance, N):
 
 #MAIN
 size = 3
-round_factor = 3
+round_factor = 4
 #We will use augmented matrix
 ncols = size + 1
 nrows = size

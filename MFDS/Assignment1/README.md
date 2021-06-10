@@ -1,5 +1,5 @@
 Question1:
-Gauss Eliminatin with and without pivoting for a machine with defined significant bits
+Gauss Elimination with and without pivoting for a machine with defined significant bits
 Question2:
 Gauss_Jacobi and Gauss_Seidel algorithm for iterative convergence to a solution. Algorithms according to Kreyszig Textbook. Dominant Matrix implementations present within it
 

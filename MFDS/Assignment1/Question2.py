@@ -1,7 +1,8 @@
 import numpy as np
 import sys
 import copy
-def gen_diag_non_dominant(size, multiplier):
+def gen_diag_non_dominant(size):
+  global multiplier
   """
   This code generates diagonally non dominant matrices which cannot be made dominant, even after row exchange
   """
@@ -9,7 +10,7 @@ def gen_diag_non_dominant(size, multiplier):
   flag = 0
   while (flag != size*size):
     flag = 0
-    a = 20 * np.random.rand(size,size+1)
+    a = multiplier * np.random.rand(size,size+1)
     for i in range(len(a[:,0])):
       for j in range(len(a[0,:])-1):
         if abs(a[i][j]) < np.sum(abs(a[i][:size])) - abs(a[i][j]):
@@ -59,7 +60,7 @@ def gen_mat(size, multiplier,diag_dom=False):
   #Here we break out for Diagonally non dominant flow. We understood that a matrix can be MADE diagonally dominant by row interchanges
   #Hence, we need to ensure that we need to generate a matrix which cannot be MADE diagonally dominant.
   if diag_dom==False:
-    A = gen_diag_non_dominant(size, multiplier)
+    A = gen_diag_non_dominant(size)
     #it might seem that this is an extra step but this is right way for a diagonally non dominant matrix
   print("Generated A_aug")
   print(A)
@@ -100,6 +101,11 @@ def Gauss_Seidel(A_aug, x, tolerance, N):
   b = A_aug[:,(ncol-1)]
   A = A_aug[:,0:(ncol - 1)]
   L, I, U = decompose(A)
+
+  #Calculating norm of the iteration Matrix C
+  C = np.matmul(np.linalg.inv(-I -L), U)
+  print("\t\tConvergence for Gauss Seidal = " + str(np.linalg.norm(C)))
+
   nrow = len(A[:,0])
   ncol = len(A[0,:])
   size = min(nrow,ncol)
@@ -152,6 +158,11 @@ def Gauss_Jacobi(A_aug,x, tolerance, N):
   convergence = False
   iter = 0
   mat_diff = copy.deepcopy(I - A)
+  
+  #Calculating norm of the iteration Matrix C
+  C = mat_diff
+  print("\t\tConvergence for Gauss Jacobi = " + str(np.linalg.norm(C)))
+  
   while ((convergence == False) and (iter <= N)):
     for j in range(length):
       #print(str(b[j]) + " - " + str(L[j]) +" * " + str(x_new) + "-" + str(U[j]) + "*" + str(x))
@@ -178,9 +189,9 @@ round_factor = 4
 #We will use augmented matrix
 ncols = size + 1
 nrows = size
-multiplier = 10
+multiplier = 1
 #np.array([[6, -2, 1, 11],[-2, 7, 2, 5],[1, 2, -5, -1]])#
-A_aug = gen_mat(size, multiplier,diag_dom=True)#np.array([[1.0, -0.25, -0.25, 0, 50],[-0.25,1, 0, -0.25, 50],[-0.25, 0, 1, -0.25, 25],[0, -0.25, -0.25, 1, 25]])#multiplier * np.random.rand(nrows,ncols)
+A_aug = gen_mat(size, multiplier,diag_dom=False)#np.array([[1.0, -0.25, -0.25, 0, 50],[-0.25,1, 0, -0.25, 50],[-0.25, 0, 1, -0.25, 25],[0, -0.25, -0.25, 1, 25]])#multiplier * np.random.rand(nrows,ncols)
 A_aug = A_aug.astype(float)
 #nrow = len(A_aug[:,0])
 #ncol = len(A_aug[0,:])

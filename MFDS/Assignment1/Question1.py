@@ -2,11 +2,16 @@ import numpy as np
 import sys
 import copy
 
+decimal_sigbit = 0
 def ret_sigbit(x,dimension=0):
   global d
+  global decimal_sigbit
   if dimension==0:
     try:
-      return np.around(x,decimals=(d - int(np.floor(np.log10(abs(x)))) - 1))
+      if decimal_sigbit==0:
+        return np.around(x,decimals=(d - int(np.floor(np.log10(abs(x)))) - 1))
+      elif decimal_sigbit==1:
+        return np.around(x,decimals=d)
     except:
       if x == 0.0:
         return 0.0
@@ -16,7 +21,10 @@ def ret_sigbit(x,dimension=0):
     length = len(x)
     for i in range(length):
       try:
-        x[i] = np.around(x[i],decimals=(d - int(np.floor(np.log10(abs(x[i])))) - 1))
+        if decimal_sigbit==0:
+          x[i] = np.around(x[i],decimals=(d - int(np.floor(np.log10(abs(x[i])))) - 1))
+        elif decimal_sigbit==1:
+          x[i] = np.around(x[i],decimals=d)
       except:
         if x[i] ==0.0:
           x[i]= 0.0
@@ -29,7 +37,10 @@ def ret_sigbit(x,dimension=0):
     for i in range(row):
       for j in range(col):
         try:
-          x[i,j] = np.around(x[i,j],decimals=(d - int(np.floor(np.log10(abs(x[i,j])))) - 1))
+          if decimal_sigbit==0:
+            x[i,j] = np.around(x[i,j],decimals=(d - int(np.floor(np.log10(abs(x[i,j])))) - 1))
+          else:
+            x[i,j] = np.around(x[i,j],decimals=d)
         except:
           if x[i,j] == 0.0:
             x[i,j] = 0.0
@@ -70,6 +81,9 @@ def GE(mat,pivot=False):
       temp_subtractor = scale_factor * mat[i]
       temp_subtractor = ret_sigbit(temp_subtractor,dimension=1)
       mat[j] = mat[j] - temp_subtractor
+    mat = ret_sigbit(mat,dimension=2)
+    print("After " + str(i) + " iteration, Matrix is as follows:")
+    print(mat)
   mat = ret_sigbit(mat,dimension=2)
   print("After Gaussian Elimination")
   print(mat)
@@ -108,9 +122,10 @@ def solve(mat):
 #main
 size = 4
 multiplier =  100
+decimal_sigbit = int((input("What type of rounding is this?\n\t1 : Decimal rounding 1414.788898 -> 1414.789\tfor value=3\n\t0 : Significant digit rounding 1414.788898->141\tfor value=3\nEnter 1 or 0 : ")))
 d = int(input("Enter significant digits: "))
 #mat = np.array([[0, 2, 0, 1, 0],[2, 2, 3, 2, -2], [4, -3, 0, 1, -7], [6, 1, -6, -5, 6]])
-mat = multiplier * np.random.rand(size,size +1)
+mat = np.array([[4.03, 2.19, 1.23, -4.35],[6.21, 3.61, -2.46, -7.16], [7.92, 5.11, 3.29, 12.83]])#multiplier * np.random.rand(size,size +1)
 mat = mat.astype(float)
 #print("Generated random matrix of size " + str(size) + " x " +str(size) + " :")
 #print(mat)
